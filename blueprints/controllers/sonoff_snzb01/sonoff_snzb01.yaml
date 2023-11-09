@@ -1,22 +1,22 @@
 # Blueprint metadata
 blueprint:
-  name: Controller - IKEA ICTC-G-1 TRÅDFRI wireless dimmer
+  name: Controller - SONOFF SNZB-01 Wireless Switch
   description: |
-    # Controller - IKEA ICTC-G-1 TRÅDFRI wireless dimmer
+    # Controller - SONOFF SNZB-01 Wireless Switch
 
-    Controller automation for executing any kind of action triggered by the provided IKEA ICTC-G-1 TRÅDFRI wireless dimmer. Allows to optionally loop a custom action during controller rotation.
+    Controller automation for executing any kind of action triggered by the provided SONOFF SNZB-01 Wireless Switch.
     Supports deCONZ, ZHA, Zigbee2MQTT.
 
     Automations created with this blueprint can be connected with one or more [Hooks](https://epmatt.github.io/awesome-ha-blueprints/docs/blueprints/hooks) supported by this controller.
     Hooks allow to easily create controller-based automations for interacting with media players, lights, covers and more.
-    See the list of [Hooks available for this controller](https://epmatt.github.io/awesome-ha-blueprints/docs/blueprints/controllers/ikea_ictc_g_1#available-hooks) for additional details.
+    See the list of [Hooks available for this controller](https://epmatt.github.io/awesome-ha-blueprints/docs/blueprints/controllers/sonoff_snzb01#available-hooks) for additional details.
 
-    📕 Full documentation regarding this blueprint is available [here](https://epmatt.github.io/awesome-ha-blueprints/docs/blueprints/controllers/ikea_ictc_g_1).
+    📕 Full documentation regarding this blueprint is available [here](https://epmatt.github.io/awesome-ha-blueprints/docs/blueprints/controllers/sonoff_snzb01).
 
     🚀 This blueprint is part of the **[Awesome HA Blueprints](https://epmatt.github.io/awesome-ha-blueprints) project**.
 
     ℹ️ Version 2022.08.08
-  source_url: https://github.com/EPMatt/awesome-ha-blueprints/blob/main/blueprints/controllers/ikea_ictc_g_1/ikea_ictc_g_1.yaml
+  source_url: https://github.com/EPMatt/awesome-ha-blueprints/blob/main/blueprints/controllers/sonoff_snzb01/sonoff_snzb01.yaml
   domain: automation
   input:
     integration:
@@ -49,67 +49,24 @@ blueprint:
         entity:
           domain: input_text
     # inputs for custom actions
-    action_rotate_left:
-      name: (Optional) Rotate left
-      description: Action to run on rotate left.
+    action_button_short:
+      name: (Optional) Button short press
+      description: Action to run on short button press.
       default: []
       selector:
         action:
-    action_rotate_left_stop:
-      name: (Optional) Rotate left stop
-      description: Action to run when stopping to rotate left the remote.
+    action_button_long:
+      name: (Optional) Button long press
+      description: Action to run on long button press.
       default: []
       selector:
         action:
-    action_rotate_right:
-      name: (Optional) Rotate right
-      description: Action to run on rotate right.
+    action_button_double:
+      name: (Optional) Button double press
+      description: Action to run on double button press.
       default: []
       selector:
         action:
-    action_rotate_right_stop:
-      name: (Optional) Rotate right stop
-      description: Action to run when stopping to rotate right the remote.
-      default: []
-      selector:
-        action:
-    # inputs for looping custom actions on long button press events until the corresponding release event is received
-    rotate_left_loop:
-      name: (Optional) Rotate left - loop until stop
-      description: Loop the rotate left action until the rotation is stopped.
-      default: false
-      selector:
-        boolean:
-    rotate_left_max_loop_repeats:
-      name: (Optional) Rotate left - Maximum loop repeats
-      description: >-
-        Maximum number of repeats for the custom action, when looping is enabled.
-        Use it as a safety limit to prevent an endless loop in case the corresponding stop event is not received.
-      default: 500
-      selector:
-        number:
-          min: 1
-          max: 5000
-          mode: slider
-          step: 1
-    rotate_right_loop:
-      name: (Optional) Rotate right - loop until stop
-      description: Loop the rotate right action until the rotation is stopped.
-      default: false
-      selector:
-        boolean:
-    rotate_right_max_loop_repeats:
-      name: (Optional) Rotate right - Maximum loop repeats
-      description: >-
-        Maximum number of repeats for the custom action, when looping is enabled.
-        Use it as a safety limit to prevent an endless loop in case the corresponding stop event is not received.
-      default: 500
-      selector:
-        number:
-          min: 1
-          max: 5000
-          mode: slider
-          step: 1
     # helpers used to properly recognize the remote button events
     helper_debounce_delay:
       name: (Optional) Helper - Debounce delay
@@ -128,10 +85,6 @@ blueprint:
 variables:
   # convert input tags to variables, to be used in templates
   integration: !input integration
-  rotate_left_loop: !input rotate_left_loop
-  rotate_left_max_loop_repeats: !input rotate_left_max_loop_repeats
-  rotate_right_loop: !input rotate_right_loop
-  rotate_right_max_loop_repeats: !input rotate_right_max_loop_repeats
   helper_last_controller_event: !input helper_last_controller_event
   helper_debounce_delay: !input helper_debounce_delay
   # integration id used to select items in the action mapping
@@ -139,22 +92,22 @@ variables:
   # mapping between actions and integrations
   actions_mapping:
     deconz:
-      rotate_left: ['3002']
-      rotate_stop: []
-      rotate_right: ['2002']
+      button_short: ['1002']
+      button_long: ['1001']
+      button_double: ['1004']
     zha:
-      rotate_left: [move_1_70, move_1_195]
-      rotate_stop: [stop]
-      rotate_right: [move_with_on_off_0_70, move_with_on_off_0_195]
+      button_short: [toggle]
+      button_long: ['off']
+      button_double: ['on']
     zigbee2mqtt:
-      rotate_left: [brightness_move_down]
-      rotate_stop: [brightness_stop]
-      rotate_right: [brightness_move_up]
+      button_short: [single]
+      button_long: [long]
+      button_double: [double]
   # pre-choose actions for buttons based on configured integration
   # no need to perform this task at automation runtime
-  rotate_left: '{{ actions_mapping[integration_id]["rotate_left"] }}'
-  rotate_stop: '{{ actions_mapping[integration_id]["rotate_stop"] }}'
-  rotate_right: '{{ actions_mapping[integration_id]["rotate_right"] }}'
+  button_short: '{{ actions_mapping[integration_id]["button_short"] }}'
+  button_long: '{{ actions_mapping[integration_id]["button_long"] }}'
+  button_double: '{{ actions_mapping[integration_id]["button_double"] }}'
   # build data to send within a controller event
   controller_entity: !input controller_entity
   controller_device: !input controller_device
@@ -210,7 +163,6 @@ action:
         {{ trigger.event.data.command }}{{"_" if trigger.event.data.args|length > 0}}{{ trigger.event.data.args|join("_") }}
         {%- endif -%}
       trigger_delta: '{{ (as_timestamp(now()) - ((states(helper_last_controller_event) | from_json).t if helper_last_controller_event is not none and (states(helper_last_controller_event) | regex_match("^\{((\"a\": \".*\"|\"t\": \d+\.\d+)(, )?){2}\}$")) else as_timestamp("1970-01-01 00:00:00"))) * 1000 }}'
-      last_controller_event: '{{ (states(helper_last_controller_event) | from_json).a if helper_last_controller_event is not none and (states(helper_last_controller_event) | regex_match("^\{((\"a\": \".*\"|\"t\": \d+\.\d+)(, )?){2}\}$")) else "" }}'
   # update helper
   - service: input_text.set_value
     data:
@@ -218,63 +170,36 @@ action:
       value: '{{ {"a":trigger_action,"t":as_timestamp(now())} | to_json }}'
   # choose the sequence to run based on the received button event
   - choose:
-      - conditions: '{{ trigger_action | string in rotate_left }}'
-        sequence:
-          # fire the event only once before looping the action
-          - event: ahb_controller_event
-            event_data:
-              controller: '{{ controller_id }}'
-              action: rotate_left
-          - choose:
-              # if looping is enabled, loop the action for a finite number of iterations
-              - conditions: '{{ rotate_left_loop }}'
-                sequence:
-                  - repeat:
-                      while: '{{ repeat.index < rotate_left_max_loop_repeats | int }}'
-                      sequence: !input action_rotate_left
-            # if looping is not enabled run the custom action only once
-            default: !input action_rotate_left
-      - conditions:
-          - '{{ trigger_action | string in rotate_stop }}'
-          # check the previous event to determine the event which the received stop action is relative to
-          - '{{ last_controller_event | string in rotate_left }}'
+      - conditions: '{{ trigger_action | string in button_short }}'
         sequence:
           # fire the event
           - event: ahb_controller_event
             event_data:
               controller: '{{ controller_id }}'
-              action: rotate_left_stop
+              action: button_short
           # run the custom action
           - choose:
               - conditions: []
-                sequence: !input action_rotate_left_stop
-      - conditions: '{{ trigger_action | string in rotate_right }}'
-        sequence:
-          # fire the event only once before looping the action
-          - event: ahb_controller_event
-            event_data:
-              controller: '{{ controller_id }}'
-              action: rotate_right
-          - choose:
-              # if looping is enabled, loop the action for a finite number of iterations
-              - conditions: '{{ rotate_right_loop }}'
-                sequence:
-                  - repeat:
-                      while: '{{ repeat.index < rotate_right_max_loop_repeats | int }}'
-                      sequence: !input action_rotate_right
-            # if looping is not enabled run the custom action only once
-            default: !input action_rotate_right
-      - conditions:
-          - '{{ trigger_action | string in rotate_stop }}'
-          # check the previous event to determine the event which the received stop action is relative to
-          - '{{ last_controller_event | string in rotate_right }}'
+                sequence: !input action_button_short
+      - conditions: '{{ trigger_action | string in button_long }}'
         sequence:
           # fire the event
           - event: ahb_controller_event
             event_data:
               controller: '{{ controller_id }}'
-              action: rotate_right_stop
+              action: button_long
           # run the custom action
           - choose:
               - conditions: []
-                sequence: !input action_rotate_right_stop
+                sequence: !input action_button_long
+      - conditions: '{{ trigger_action | string in button_double }}'
+        sequence:
+          # fire the event
+          - event: ahb_controller_event
+            event_data:
+              controller: '{{ controller_id }}'
+              action: button_double
+          # run the custom action
+          - choose:
+              - conditions: []
+                sequence: !input action_button_double
